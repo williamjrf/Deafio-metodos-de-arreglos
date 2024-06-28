@@ -1,0 +1,81 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div><h1>Todo List</h1>
+        <h3>Nueva tarea</h3>
+      <input type="text" />
+      <button id="agregar">Agregar</button>
+    </div>
+    <p id="cantidad"></p>
+    <p id="notificados"></p>
+    <ul id="lista"></ul>
+    <script>
+      const invitados = [
+        { id: 431, nombre: "Hacer mercado", notificado: false },
+        { id: 124, nombre: "Estudiar para la prueba", notificado: false },
+        { id: 541, nombre: "Sacar a pasear a tobby", notificado: false },
+        
+      ];
+
+      const btn = document.querySelector("#agregar");
+      const lista = document.querySelector("#lista");
+
+      const actualizar = (id) => {
+        let invitadoIndex = invitados.findIndex(
+          (invitado) => invitado.id === id
+        );
+        console.log(invitadoIndex);
+        invitados[invitadoIndex].notificado = !invitados[invitadoIndex].notificado;
+        let invitadosNotificados = invitados.filter(
+          (invitado) => invitado.notificado == true
+        );
+        console.log(invitadosNotificados);
+        document.querySelector(
+          "#notificados"
+        ).innerHTML = `Realizadas: ${invitadosNotificados.length}`;
+      };
+
+      const eliminar = (id) => {
+        let invitadoIndex = invitados.findIndex(
+          (invitado) => invitado.id === id
+        );
+        invitados.splice(invitadoIndex, 1);
+        invitado_actual();
+      };
+
+      const invitado_actual = () => {
+        let html = ``;
+        invitados.forEach((invitado) => {
+          console.log(invitado.notificado);
+          html += `<li>${invitado.nombre} | <button onclick='eliminar(${
+            invitado.id
+          })'>Eliminar</button> | <input type='checkbox' onclick='actualizar(${
+            invitado.id
+          })' ${invitado.notificado === true ? "checked" : null}></li>`;
+        });
+        document.querySelector(
+          "#cantidad"
+        ).innerHTML = `Total: ${invitados.length}`;
+        lista.innerHTML = html;
+      };
+
+      btn.addEventListener("click", () => {
+        let value = document.querySelector("input").value;
+        let nuevo_usuario = {
+          id: Date.now(),
+          nombre: value,
+          notificado: false,
+        };
+        invitados.push(nuevo_usuario);
+        invitado_actual();
+      });
+
+      invitado_actual();
+    </script>
+  </body>
+</html>
