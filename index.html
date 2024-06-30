@@ -4,37 +4,71 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <title>Document</title>
+  <style>
+    table tr td {
+      border: none !important;
+    }
+  </style>
 </head>
 
-<body>
-  <div>
-    <h1>Todo List</h1>
-    <h3>Nueva tarea</h3>
-    <input type="text" />
-    <button id="agregar">Agregar</button>
+<body class="container">
+  <div class="jumbotron">
+
+
+    <div class="row">
+      <div class="col-md-12">
+        <h1>Todo List</h1>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-md-12">
+        <h3>Nueva tarea</h3>
+      </div>
+
+    </div>
+    <div class="row">
+      <div class="col col-md-11"><input class="form-control" type="text" /></div>
+      <div class="col col-md-1"><button class="btn btn-success" id="agregar">Agregar</button></div>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col col-md-6">
+        <p id="cantidad"></p>
+        <p id="notificados"></p>
+
+      </div>
+      <div class="col col-md-6">
+        <table class="table" id="tablalista">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tarea</th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>16</td>
+              <td>Hacer mercado</td>
+              <td><input type='checkbox'></td>
+              <td> <button>Eliminar</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+
   </div>
-  <p id="cantidad"></p>
-  <p id="notificados"></p>
-  <ul id="lista"></ul>
-  <table id="tablalista"> 
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Tarea</th>
-        <th></th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>16</td>
-        <td>Hacer mercado</td>
-        <td><input type='checkbox'></td>
-        <td> <button>Eliminar</button></td>
-      </tr>
-    </tbody>
-  </table>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+    integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+    crossorigin="anonymous"></script>
   <script>
     const invitados = [
       { id: 431, nombre: "Hacer mercado", notificado: false },
@@ -46,50 +80,6 @@
     const btn = document.querySelector("#agregar");
     const lista = document.querySelector("#lista");
 
-    const actualizar = (id) => {
-      let invitadoIndex = invitados.findIndex(
-        (invitado) => invitado.id === id
-      );
-      console.log(invitadoIndex);
-      invitados[invitadoIndex].notificado = !invitados[invitadoIndex].notificado;
-      let invitadosNotificados = invitados.filter(
-        (invitado) => invitado.notificado == true
-      );
-      console.log(invitadosNotificados);
-      document.querySelector(
-        "#notificados"
-      ).innerHTML = `Realizadas: ${invitadosNotificados.length}`;
-    };
-
-    const eliminar = (id) => {
-      let invitadoIndex = invitados.findIndex(
-        (invitado) => invitado.id === id
-      );
-      invitados.splice(invitadoIndex, 1);
-      invitado_actual();
-      let invitadosNotificados = invitados.filter(
-        (invitado) => invitado.notificado == true
-      );
-      console.log(invitadosNotificados);
-      document.querySelector(
-        "#notificados"
-      ).innerHTML = `Realizadas: ${invitadosNotificados.length}`;
-    };
-
-    const invitado_actual = () => {
-      let html = ``;
-      invitados.forEach((invitado) => {
-        console.log(invitado.notificado);
-        html += `<li>${invitado.nombre} | <button onclick='eliminar(${invitado.id
-          })'>Eliminar</button> | <input type='checkbox' onclick='actualizar(${invitado.id
-          })' ${invitado.notificado === true ? "checked" : null}></li>`;
-      });
-      document.querySelector(
-        "#cantidad"
-      ).innerHTML = `Total: ${invitados.length}`;
-      lista.innerHTML = html;
-    };
-
     btn.addEventListener("click", () => {
       let value = document.querySelector("input").value;
       let nuevo_usuario = {
@@ -98,10 +88,90 @@
         notificado: false,
       };
       invitados.push(nuevo_usuario);
-      invitado_actual();
+
+      refrescarTabla();
+
     });
 
-    invitado_actual();
+
+
+    const refrescarTabla = () => {
+      document.querySelector("#tablalista tbody").innerHTML = "";
+
+      invitados.forEach((invitado) => {
+        construirItemHtml(invitado);
+      });
+
+      construirTotalSeleccionados();
+      construirTotal();
+    }
+
+    const construirItemHtml = (item) => {
+
+      let table = document.querySelector("#tablalista tbody");
+      let rowLength = table.rows.length;
+
+      let row = table.insertRow(rowLength);
+      let cell1 = row.insertCell(0);
+      let cell2 = row.insertCell(1);
+      let cell3 = row.insertCell(2);
+      let cell4 = row.insertCell(3);
+
+      cell1.innerHTML = item.id;
+      cell2.innerHTML = item.nombre;
+      cell3.innerHTML = `<input type='checkbox' onclick='toggleItem(${item.id})' ${item.notificado ? "checked" : ""}>`;
+
+
+
+      cell4.innerHTML = `<span onclick='eliminarItem(${item.id
+        })' class="glyphicon glyphicon-remove text-danger" aria-hidden="true"></span>`;
+
+
+    }
+
+    const construirTotalSeleccionados = () => {
+      let invitadosNotificados = invitados.filter(
+        (invitado) => invitado.notificado == true
+      );
+      document.querySelector(
+        "#notificados"
+      ).innerHTML = `Realizadas: <strong> ${invitadosNotificados.length} </strong>`;
+    }
+
+    const construirTotal = () => {
+      document.querySelector("#cantidad").innerHTML = `Total: <strong> ${invitados.length} </strong>`;
+    }
+
+
+    const eliminarItem = (id) => {
+
+      let itemIndex = invitados.findIndex(
+        (invitado) => invitado.id === id
+      );
+
+      invitados.splice(itemIndex, 1);
+      refrescarTabla();
+
+      
+    }
+
+    const agregarItem = (item) => {
+      invitados.push(item);
+      refrescarTabla();
+    }
+
+    const toggleItem = (id) => {
+      let itemIndex = invitados.findIndex(
+        (invitado) => invitado.id === id
+      );
+
+      if (itemIndex !== -1) {
+        invitados[itemIndex].notificado = !invitados[itemIndex].notificado;
+        refrescarTabla();
+      }
+    }
+    refrescarTabla();
+
   </script>
 </body>
 
